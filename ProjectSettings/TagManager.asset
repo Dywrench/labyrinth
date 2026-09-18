@@ -7,6 +7,9 @@ TagManager:
   - Collectable
   - Damage
   - winL1
+  - Wall
+  - Collectable2
+  - Sphere
   layers:
   - Default
   - TransparentFX

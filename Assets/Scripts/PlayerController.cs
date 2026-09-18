@@ -25,6 +25,10 @@ public class PlayerController : MonoBehaviour
 
     // Posicion inicial del jugador
     private Vector3 posicionInicial;
+    //Desaparecer objeto
+    private int numeroObjetos = 10;
+    private int cantidadObjetos = 0;
+    public GameObject Final;
 
     void Start()
     {
@@ -100,6 +104,23 @@ public class PlayerController : MonoBehaviour
             particlesSystem.Play();
 
             other.gameObject.SetActive(false);
+        }
+        
+         if (other.gameObject.CompareTag("Collectable2"))
+        {
+            position = other.gameObject.transform.position;
+            particles.position = position;
+            particlesSystem.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+            particlesSystem.Play();
+            other.gameObject.SetActive(false);
+            cantidadObjetos ++;
+               if(cantidadObjetos == numeroObjetos)
+               {
+                Final.SetActive(false);
+               }
         }
 
         // DAÑO DEL PINCHO
