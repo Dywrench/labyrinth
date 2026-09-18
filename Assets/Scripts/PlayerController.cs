@@ -29,7 +29,8 @@ public class PlayerController : MonoBehaviour
     private int numeroObjetos = 10;
     private int cantidadObjetos = 0;
     public GameObject Final;
-
+    //Sistema de auido
+    private AudioSource audioImpact;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -43,6 +44,8 @@ public class PlayerController : MonoBehaviour
         main.loop = false;
 
         particlesSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        audioImpact = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -104,6 +107,7 @@ public class PlayerController : MonoBehaviour
             particlesSystem.Play();
 
             other.gameObject.SetActive(false);
+            audioImpact.Play();
         }
         
          if (other.gameObject.CompareTag("Collectable2"))
@@ -116,13 +120,14 @@ public class PlayerController : MonoBehaviour
             );
             particlesSystem.Play();
             other.gameObject.SetActive(false);
+            audioImpact.Play();
             cantidadObjetos ++;
                if(cantidadObjetos == numeroObjetos)
                {
                 Final.SetActive(false);
                }
         }
-
+       
         // DAÑO DEL PINCHO
         if (other.gameObject.CompareTag("Damage"))
         {
@@ -141,7 +146,7 @@ public class PlayerController : MonoBehaviour
 
                 // Reiniciar contador
                 golpes = 0;
-
+                cantidadObjetos = 0;
                 Debug.Log("¡Tres golpes! Volviendo al inicio.");
             }
         }
