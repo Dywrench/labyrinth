@@ -1,3 +1,4 @@
+# Unity
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -6,11 +7,17 @@
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 
+# IDE
 .vs/
-.idea/
+.vscode/
 
+# Visual Studio / Rider
 *.csproj
 *.sln
+*.slnx
+*.user
 *.userprefs
 
+# Sistema
 .DS_Store
+Thumbs.db

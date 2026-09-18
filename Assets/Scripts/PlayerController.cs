@@ -2,68 +2,139 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // Referencia al sistema de controles
     private InputSystem_Actions controls;
+
     public float speed;
     private Rigidbody rb;
     private Vector2 moveInput;
+
+    // Referencia al objeto de particulas
     public Transform particles;
+
+    // Sistema de particulas
     private ParticleSystem particlesSystem;
+
     private Vector3 position;
+
+    // GOLPES RECIBIDOS
+    public int golpes = 0;
+
+    // Golpes necesarios para volver al inicio
+    public int golpesMaximos = 3;
+
+    // Posicion inicial del jugador
+    private Vector3 posicionInicial;
+
     void Start()
     {
-        //se obtiene el componente de la esfera
         rb = GetComponent<Rigidbody>();
-        //se obtiene el componente del sistema de particulas
+
+        // Guarda la posicion inicial
+        posicionInicial = transform.position;
+
         particlesSystem = particles.GetComponent<ParticleSystem>();
-        //este metodo permite detener la emision de particulas al inicio del juego
-        particlesSystem.Stop();
+
+        var main = particlesSystem.main;
+        main.loop = false;
+
+        particlesSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
-    // Update is called once per frame
+
     void Update()
     {
 
     }
+
     void FixedUpdate()
     {
-        Vector3 movement = new Vector3(moveInput.x, 0.0f, moveInput.y); //movement input ayuda pa que se genere una fuerza en la esfera
-        rb.AddForce(movement * speed);//llama metodo Addforce (añadir fuerza a la direccion del movimiento) del metodo rb (rigidbody) 
+        Vector3 movement = new Vector3(
+            moveInput.x,
+            0.0f,
+            moveInput.y
+        );
+
+        rb.AddForce(movement * speed);
     }
+
     void Awake()
     {
         controls = new InputSystem_Actions();
-        // enlaza al input de movimiento, es para detectar cuando el jugador mueve o deja de mover el control
-        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+
+        // Detecta cuando el jugador se mueve
+        controls.Player.Move.performed += ctx =>
+            moveInput = ctx.ReadValue<Vector2>();
+
+        // Detecta cuando deja de moverse
+        controls.Player.Move.canceled += ctx =>
+            moveInput = Vector2.zero;
     }
+
     void OnEnable()
     {
         controls.Enable();
     }
+
     void OnDisable()
     {
-        controls.Disable();
+        if (controls != null)
+        {
+            controls.Disable();
+        }
     }
+
     void OnTriggerEnter(Collider other)
     {
-          // el objeto es recolectable
+        // COLECCIONABLE
         if (other.gameObject.CompareTag("Collectable"))
         {
-            // obtiene la posicion del objeto recolectable
-            position = other.gameObject.transform.position; 
-            particles.position = position; // se asigna la posicion del objeto recolectable a la posicion del sistema de particulas
-            particlesSystem = particles.GetComponent<ParticleSystem>(); // se obtiene el componente del sistema de particulas
-            particlesSystem.Play(); // se activa el sistema de particulas
-            // desactiva el objeto recolectable (lo oculta de la escena)  
+            position = other.gameObject.transform.position;
+
+            particles.position = position;
+
+            particlesSystem.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+
+            particlesSystem.Play();
+
             other.gameObject.SetActive(false);
         }
-        else // el objeto no es recolectable
+
+        // DAÑO DEL PINCHO
+        if (other.gameObject.CompareTag("Damage"))
         {
-           
-        }   
+            golpes++;
+
+            Debug.Log("Golpe recibido: " + golpes + "/" + golpesMaximos);
+
+            // Si llega a 3 golpes
+            if (golpes >= golpesMaximos)
+            {
+                // Volver al inicio
+                transform.position = posicionInicial;
+
+                // Detener movimiento
+                rb.linearVelocity = Vector3.zero;
+
+                // Reiniciar contador
+                golpes = 0;
+
+                Debug.Log("¡Tres golpes! Volviendo al inicio.");
+            }
+        }
+
+        // PLACEHOLDER PARA GANAR EL NIVEL
+        if (other.gameObject.CompareTag("winL1"))
+        {
+            // Volver al inicio
+            transform.position = posicionInicial;
+
+            // Detener movimiento
+            rb.linearVelocity = Vector3.zero;
+
+            Debug.Log("¡Nivel 1 completado!");
+        }
     }
-
-    
-
-
 }
