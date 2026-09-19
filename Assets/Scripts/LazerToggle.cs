@@ -7,20 +7,31 @@ public class LazerToggle : MonoBehaviour
     [SerializeField] private float tiempoInactivo = 2f;
     [SerializeField] private bool empiezaActivo = true;
 
+    [Header("Sonido")]
+    [SerializeField] private LazerSound lazerSound;
+    [SerializeField] private bool detenerSonidoAlDesactivar = false;
+
     private Renderer[] renderers;
     private Collider[] colliders;
+    private AudioSource audioSource;
     private float timer;
     private bool activo;
 
     private void Awake()
     {
-        // Busca componentes en este objeto y en todos sus hijos.
         renderers = GetComponentsInChildren<Renderer>(true);
         colliders = GetComponentsInChildren<Collider>(true);
 
+        if (lazerSound == null)
+        {
+            lazerSound = GetComponent<LazerSound>();
+        }
+
+        audioSource = GetComponent<AudioSource>();
+
         activo = empiezaActivo;
         timer = activo ? tiempoActivo : tiempoInactivo;
-        SetEstado(activo);
+        SetEstado(activo, reproducirSonido: false);
     }
 
     private void Update()
@@ -35,7 +46,7 @@ public class LazerToggle : MonoBehaviour
         }
     }
 
-    private void SetEstado(bool estado)
+    private void SetEstado(bool estado, bool reproducirSonido = true)
     {
         foreach (Renderer renderer in renderers)
         {
@@ -45,6 +56,18 @@ public class LazerToggle : MonoBehaviour
         foreach (Collider collider in colliders)
         {
             collider.enabled = estado;
+        }
+
+        if (reproducirSonido)
+        {
+            if (estado)
+            {
+                lazerSound?.Reproducir();
+            }
+            else if (detenerSonidoAlDesactivar && audioSource != null)
+            {
+                audioSource.Stop();
+            }
         }
     }
 }

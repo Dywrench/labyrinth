@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     public GameObject platform;
     // Sonido de la pared
     [SerializeField] private AudioSource audioImpact;
+    [SerializeField] private AudioSource audioPlatform;
+    [SerializeField] private AudioSource damageSound;
     
    
     void Start()
@@ -146,6 +148,7 @@ public class PlayerController : MonoBehaviour
         // Pincho
         if (other.gameObject.CompareTag("Damage"))
         {
+            damageSound.Play();
             golpes++;
 
             Debug.Log("Golpe recibido: " + golpes + "/" + golpesMaximos);
@@ -162,12 +165,14 @@ public class PlayerController : MonoBehaviour
                 // Reiniciar los objetos
                 golpes = 0;
                 cantidadObjetos = 0;
-                Debug.Log("¡Tres golpes! Volviendo al inicio.");
+                platform.SetActive(true);
+               
             }
         }
         // Laser
         if (other.gameObject.CompareTag("LazerDamage"))
         {
+            platform.SetActive(true);
             // Volver al inicio
             transform.position = posicionInicial;
 
@@ -196,9 +201,14 @@ public class PlayerController : MonoBehaviour
         {
             audioImpact.Play();
         }
-         if (collision.gameObject.CompareTag("plane") && audioImpact != null)
+        if (collision.gameObject.CompareTag("plane") && platform != null && platform.activeSelf)
         {
             platform.SetActive(false);
+
+            if (audioPlatform != null)
+            {
+                audioPlatform.Play();
+            }
         }
     }
 }
