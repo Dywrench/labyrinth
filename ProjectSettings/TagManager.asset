@@ -11,6 +11,7 @@ TagManager:
   - Collectable2
   - Sphere
   - LazerDamage
+  - plane
   layers:
   - Default
   - TransparentFX
