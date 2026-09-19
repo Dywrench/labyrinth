@@ -3,13 +3,11 @@ using UnityEngine;
 public class TeleportTrap : MonoBehaviour
 {
     private AudioSource audioTeleport;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         audioTeleport = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         

@@ -1,36 +1,37 @@
+using System.Collections;
 using UnityEngine;
-
 public class PlayerController : MonoBehaviour
 {
-    // Referencia al sistema de controles
+    // Controles del jugador
     private InputSystem_Actions controls;
-
     public float speed;
     private Rigidbody rb;
     private Vector2 moveInput;
 
-    // Referencia al objeto de particulas
+    // Particulas
     public Transform particles;
 
-    // Sistema de particulas
+    // Control de las particulas
     private ParticleSystem particlesSystem;
 
     private Vector3 position;
 
-    // GOLPES RECIBIDOS
+    // Golpes recibidos
     public int golpes = 0;
 
-    // Golpes necesarios para volver al inicio
+    // Golpes para volver al inicio
     public int golpesMaximos = 3;
 
-    // Posicion inicial del jugador
+    // Posicion inicial
     private Vector3 posicionInicial;
-    //Desaparecer objeto
+    // Objetos que faltan
     private int numeroObjetos = 10;
     private int cantidadObjetos = 0;
     public GameObject Final;
-    //Sistema de auido
-    private AudioSource audioImpact;
+    // Sonido de la pared
+    [SerializeField] private AudioSource audioImpact;
+    
+   
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -45,7 +46,11 @@ public class PlayerController : MonoBehaviour
 
         particlesSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        audioImpact = GetComponent<AudioSource>();
+        if (audioImpact == null)
+        {
+            audioImpact = GetComponent<AudioSource>();
+        }
+
     }
 
     void Update()
@@ -66,19 +71,30 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        InicializarControles();
+    }
+
+    private void InicializarControles()
+    {
+        if (controls != null)
+        {
+            return;
+        }
+
         controls = new InputSystem_Actions();
 
-        // Detecta cuando el jugador se mueve
+        // Cuando el jugador se mueve
         controls.Player.Move.performed += ctx =>
             moveInput = ctx.ReadValue<Vector2>();
 
-        // Detecta cuando deja de moverse
+        // Cuando deja de moverse
         controls.Player.Move.canceled += ctx =>
             moveInput = Vector2.zero;
     }
 
     void OnEnable()
     {
+        InicializarControles();
         controls.Enable();
     }
 
@@ -92,7 +108,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // COLECCIONABLE
+        // Recoger objeto
         if (other.gameObject.CompareTag("Collectable"))
         {
             position = other.gameObject.transform.position;
@@ -107,10 +123,9 @@ public class PlayerController : MonoBehaviour
             particlesSystem.Play();
 
             other.gameObject.SetActive(false);
-            audioImpact.Play();
         }
-        
-         if (other.gameObject.CompareTag("Collectable2"))
+
+        if (other.gameObject.CompareTag("Collectable2"))
         {
             position = other.gameObject.transform.position;
             particles.position = position;
@@ -120,47 +135,65 @@ public class PlayerController : MonoBehaviour
             );
             particlesSystem.Play();
             other.gameObject.SetActive(false);
-            audioImpact.Play();
-            cantidadObjetos ++;
-               if(cantidadObjetos == numeroObjetos)
-               {
+            cantidadObjetos++;
+            if (cantidadObjetos == numeroObjetos)
+            {
                 Final.SetActive(false);
-               }
+            }
         }
-       
-        // DAÑO DEL PINCHO
+
+        // Pincho
         if (other.gameObject.CompareTag("Damage"))
         {
             golpes++;
 
             Debug.Log("Golpe recibido: " + golpes + "/" + golpesMaximos);
 
-            // Si llega a 3 golpes
+            // Si recibe los golpes necesarios
             if (golpes >= golpesMaximos)
             {
                 // Volver al inicio
                 transform.position = posicionInicial;
 
-                // Detener movimiento
+                // Parar movimiento
                 rb.linearVelocity = Vector3.zero;
 
-                // Reiniciar contador
+                // Reiniciar los objetos
                 golpes = 0;
                 cantidadObjetos = 0;
                 Debug.Log("¡Tres golpes! Volviendo al inicio.");
             }
         }
-
-        // PLACEHOLDER PARA GANAR EL NIVEL
-        if (other.gameObject.CompareTag("winL1"))
+        // Laser
+        if (other.gameObject.CompareTag("LazerDamage"))
         {
             // Volver al inicio
             transform.position = posicionInicial;
 
-            // Detener movimiento
+            // Parar movimiento
+            rb.linearVelocity = Vector3.zero;
+
+        }
+
+        // Terminar nivel 1
+        if (other.gameObject.CompareTag("winL1"))
+        {
+            // Ir al siguiente punto
+            transform.position = new Vector3(-54.4f, 9.81f, -27f);
+
+            // Parar movimiento
             rb.linearVelocity = Vector3.zero;
 
             Debug.Log("¡Nivel 1 completado!");
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        // Sonido al chocar con una pared
+        if (collision.gameObject.CompareTag("Wall") && audioImpact != null)
+        {
+            audioImpact.Play();
         }
     }
 }

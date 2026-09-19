@@ -10,6 +10,7 @@ TagManager:
   - Wall
   - Collectable2
   - Sphere
+  - LazerDamage
   layers:
   - Default
   - TransparentFX

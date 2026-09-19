@@ -2,25 +2,25 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    // Jugador que seguira la camara
+    // Jugador que sigue la camara
     public GameObject player;
 
-    // Distancia de la camara respecto al jugador
+    // Distancia entre la camara y el jugador
     private Vector3 offset;
 
-    // Limites de movimiento de la camara
+    // Limites de la camara
     public float limiteXMin = -10f;
     public float limiteXMax = 10f;
 
     public float limiteZMin = -10f;
     public float limiteZMax = 10f;
 
-    // Velocidad con la que la camara sigue al jugador
+    // Velocidad de la camara
     public float velocidadCamara = 5f;
 
     void Start()
     {
-        // Guarda la distancia inicial entre la camara y el jugador
+        // Guarda la distancia inicial
         offset = transform.position - player.transform.position;
     }
 
@@ -31,10 +31,10 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
-        // Posicion que deberia tener la camara siguiendo al jugador
+        // Nueva posicion de la camara
         Vector3 nuevaPosicion = player.transform.position + offset;
 
-        // Limita el movimiento horizontal de la camara
+        // No deja que la camara salga de los limites
         nuevaPosicion.x = Mathf.Clamp(
             nuevaPosicion.x,
             limiteXMin,
@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour
             limiteZMax
         );
 
-        // Movimiento suave hacia la nueva posicion
+        // Mueve la camara suavemente
         transform.position = Vector3.Lerp(
             transform.position,
             nuevaPosicion,
