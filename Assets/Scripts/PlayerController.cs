@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private int numeroObjetos = 10;
     private int cantidadObjetos = 0;
     public GameObject Final;
+    public GameObject platform;
     // Sonido de la pared
     [SerializeField] private AudioSource audioImpact;
     
@@ -194,6 +195,10 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Wall") && audioImpact != null)
         {
             audioImpact.Play();
+        }
+         if (collision.gameObject.CompareTag("plane") && audioImpact != null)
+        {
+            platform.SetActive(false);
         }
     }
 }
